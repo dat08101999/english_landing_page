@@ -15,7 +15,9 @@ let app = firebase.initializeApp(firebaseConfig);
 let analytics = firebase.analytics();
 
 function ontapButton(buttonType){
-    logEventWithDetails(buttonType)
+    logEventWithDetails(buttonType,{
+    
+})
 }
 // Event detail
 function logEventWithDetails(eventName, additionalParams = {}) {

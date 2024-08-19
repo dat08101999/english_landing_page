@@ -68,7 +68,6 @@ async function sendLogEvent(eventName, platform, osVersion, deviceName, userAgen
 
    await firebase.analytics().logEvent(eventName, eventParams);
     console.log(`${eventName} event logged with details:`, eventParams);
-    alert(`${eventName} event logged with details:`)
 }
 
 document.addEventListener('DOMContentLoaded', (event) => {

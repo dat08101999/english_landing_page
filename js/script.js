@@ -13,11 +13,10 @@ let firebaseConfig = {
 // Firebase
 let app = firebase.initializeApp(firebaseConfig);
 let analytics = firebase.analytics();
-
+let isLocaleAccepted=false;
+let  latitude, longitude
 function ontapButton(buttonType){
-    logEventWithDetails(buttonType,{
-    
-})
+    logEventWithDetails(buttonType,{})
 }
 // Event detail
 function logEventWithDetails(eventName, additionalParams = {}) {
@@ -38,24 +37,18 @@ function logEventWithDetails(eventName, additionalParams = {}) {
     let layout = platformInfo.layout;
     let brand = platformInfo.manufacturer;
 
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition((position) => {
-            let { latitude, longitude } = position.coords;
+    if (isLocaleAccepted) {
             locationCountry = `Lat: ${latitude}, Lon: ${longitude}`;
+            sendLogEvent(eventName, platformName, osVersion, deviceName, userAgent, language, screenWidth,
+                screenHeight, locationCountry, mobileModelName, description, layout, brand, additionalParams);
 
-            sendLogEvent(eventName, platformName, osVersion, deviceName, userAgent, language, screenWidth,
-                screenHeight, locationCountry, mobileModelName, description, layout, brand, additionalParams);
-        }, (error) => {
-            sendLogEvent(eventName, platformName, osVersion, deviceName, userAgent, language, screenWidth,
-                screenHeight, locationCountry, mobileModelName, description, layout, brand, additionalParams);
-        });
     } else {
         sendLogEvent(eventName, platformName, osVersion, deviceName, userAgent, language, screenWidth,
             screenHeight, locationCountry, mobileModelName, description, layout, brand, additionalParams);
     }
 }
 
-function sendLogEvent(eventName, platform, osVersion, deviceName, userAgent, language, screenWidth,
+async function sendLogEvent(eventName, platform, osVersion, deviceName, userAgent, language, screenWidth,
      screenHeight,locationCountry, mobileModelName, description,layout,brand,additionalParams) {
     let eventParams = {
         platform: platform,
@@ -73,12 +66,21 @@ function sendLogEvent(eventName, platform, osVersion, deviceName, userAgent, lan
         ...additionalParams
     };
 
-    firebase.analytics().logEvent(eventName, eventParams);
+   await firebase.analytics().logEvent(eventName, eventParams);
     console.log(`${eventName} event logged with details:`, eventParams);
+    alert(`${eventName} event logged with details:`)
 }
 
 document.addEventListener('DOMContentLoaded', (event) => {
     // Event click image
+    navigator.geolocation.getCurrentPosition((position) => {
+        isLocaleAccepted=true
+        latitude= position.coords.latitude
+        longitude=position.coords.longitude
+      
+    }, (error) => {
+        console.log('Not accept location')
+    });
     let images = document.querySelectorAll('img');
     images.forEach((img, index) => {
         img.addEventListener('click', () => logEventWithDetails('image_click', {
@@ -88,19 +90,19 @@ document.addEventListener('DOMContentLoaded', (event) => {
     });
 
     // Event scroll
-    let lastRecordedScrollPercent = 0;
-    window.addEventListener('scroll', () => {
-        let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        let scrollHeight = document.documentElement.scrollHeight;
-        let scrollPercent = (scrollTop / (scrollHeight - window.innerHeight)) * 100;
+    // let lastRecordedScrollPercent = 0;
+    // window.addEventListener('scroll', () => {
+    //     let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    //     let scrollHeight = document.documentElement.scrollHeight;
+    //     let scrollPercent = (scrollTop / (scrollHeight - window.innerHeight)) * 100;
 
-        // Scroll 10% page
-        if (Math.abs(scrollPercent - lastRecordedScrollPercent) >= 10) {
-            lastRecordedScrollPercent = Math.floor(scrollPercent / 10) * 10;
-            logEventWithDetails('scroll_event', {
-                scroll_top: scrollTop,
-                scroll_percent: scrollPercent
-            });
-        }
-    });
+    //     // Scroll 10% page
+    //     if (Math.abs(scrollPercent - lastRecordedScrollPercent) >= 10) {
+    //         lastRecordedScrollPercent = Math.floor(scrollPercent / 10) * 10;
+    //         logEventWithDetails('scroll_event', {
+    //             scroll_top: scrollTop,
+    //             scroll_percent: scrollPercent
+    //         });
+    //     }
+    // });
 });

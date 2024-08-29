@@ -72,14 +72,14 @@ async function sendLogEvent(eventName, platform, osVersion, deviceName, userAgen
 
 document.addEventListener('DOMContentLoaded', (event) => {
     // Event click image
-    navigator.geolocation.getCurrentPosition((position) => {
-        isLocaleAccepted=true
-        latitude= position.coords.latitude
-        longitude=position.coords.longitude
+    // navigator.geolocation.getCurrentPosition((position) => {
+    //     isLocaleAccepted=true
+    //     latitude= position.coords.latitude
+    //     longitude=position.coords.longitude
       
-    }, (error) => {
-        console.log('Not accept location')
-    });
+    // }, (error) => {
+    //     console.log('Not accept location')
+    // });
     let images = document.querySelectorAll('img');
     images.forEach((img, index) => {
         img.addEventListener('click', () => logEventWithDetails('image_click', {
